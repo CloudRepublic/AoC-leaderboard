@@ -87,6 +87,18 @@ Run it from the workspace root, or set `STATIC_DIR` (the screen's
 `dist/apps/leaderboard/browser` folder) and `AOC_CACHE_FILE` to absolute paths.
 Point the Xibo webpage widget at `http://<host>:8080/`.
 
+### CI
+
+`.github/workflows/ci.yml` runs on pull requests and pushes to `main`:
+
+1. **Lint, test and build**: secret check over all tracked files, Prettier
+   check, then `nx run-many -t lint test build`.
+2. **Docker image**: builds the image for `linux/amd64` and `linux/arm64` (the
+   JavaScript is built once and shared). Pull requests only build it; pushes to
+   `main` publish it to the GitHub Container Registry as
+   `ghcr.io/<owner>/<repo>` with `latest` and `sha-<commit>` tags. No secrets
+   are needed: it uses the workflow's own `GITHUB_TOKEN`.
+
 ### Keeping private data out of git
 
 The cookie, `.env` files, `secrets/`, leaderboard dumps (`<id>.json`) and design

@@ -15,7 +15,9 @@
 ARG NODE_VERSION=24
 ARG DISTROLESS=gcr.io/distroless/nodejs24-debian13:nonroot
 
-FROM node:${NODE_VERSION}-bookworm-slim AS build
+# The build output is plain JavaScript, so build once on the runner's own
+# platform and reuse it for every target architecture.
+FROM --platform=$BUILDPLATFORM node:${NODE_VERSION}-bookworm-slim AS build
 WORKDIR /src
 ENV CI=true NX_DAEMON=false NX_NO_CLOUD=true
 COPY package.json package-lock.json ./
