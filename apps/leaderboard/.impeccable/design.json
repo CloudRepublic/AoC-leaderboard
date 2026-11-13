@@ -1,0 +1,335 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-13T14:19:02Z",
+  "title": "Design System: Caesar AoC Leaderboard",
+  "extensions": {
+    "colorMeta": {
+      "bg": {
+        "role": "neutral",
+        "displayName": "Night Navy",
+        "canonical": "#0f0f23",
+        "tonalRamp": [
+          "#0a0a12",
+          "#232430",
+          "#3f4052",
+          "#5d5f76",
+          "#7e8098",
+          "#a1a3b8",
+          "#c6c8d8",
+          "#ecedf9"
+        ]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Terminal Grey",
+        "canonical": "#cccccc",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "dim": {
+        "role": "neutral",
+        "displayName": "Muted Lavender-Grey",
+        "canonical": "#8a8a9e",
+        "tonalRamp": [
+          "#0b0b10",
+          "#24242d",
+          "#41414d",
+          "#5f5f70",
+          "#808092",
+          "#a3a3b3",
+          "#c8c8d4",
+          "#edeef6"
+        ]
+      },
+      "white": {
+        "role": "neutral",
+        "displayName": "Glow White",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "green": {
+        "role": "primary",
+        "displayName": "Terminal Green",
+        "canonical": "#00cc00",
+        "tonalRamp": [
+          "#001300",
+          "#003300",
+          "#005600",
+          "#007c00",
+          "#00a100",
+          "#55c14f",
+          "#92e08c",
+          "#caffc5"
+        ]
+      },
+      "link": {
+        "role": "primary",
+        "displayName": "Link Green",
+        "canonical": "#009900",
+        "tonalRamp": [
+          "#001200",
+          "#003100",
+          "#005300",
+          "#007800",
+          "#2a9c26",
+          "#69bc63",
+          "#9edc99",
+          "#d2fccd"
+        ]
+      },
+      "gold": {
+        "role": "secondary",
+        "displayName": "Star Gold",
+        "canonical": "#ffff66",
+        "tonalRamp": [
+          "#0e0c00",
+          "#2a2700",
+          "#484500",
+          "#6a6600",
+          "#8b8800",
+          "#abab44",
+          "#cdcf85",
+          "#f1f3c1"
+        ]
+      },
+      "silver": {
+        "role": "secondary",
+        "displayName": "Star Silver",
+        "canonical": "#9999cc",
+        "tonalRamp": [
+          "#0a0916",
+          "#232238",
+          "#3e3e5e",
+          "#5d5c87",
+          "#7d7daa",
+          "#a0a1c7",
+          "#c5c6e4",
+          "#ececff"
+        ]
+      },
+      "open": {
+        "role": "neutral",
+        "displayName": "Open Navy",
+        "canonical": "#333366",
+        "tonalRamp": [
+          "#090919",
+          "#21223c",
+          "#3c3e63",
+          "#595c8d",
+          "#7a7db1",
+          "#9da1cd",
+          "#c3c6e9",
+          "#eaedff"
+        ]
+      },
+      "locked": {
+        "role": "neutral",
+        "displayName": "Locked Slate",
+        "canonical": "#333340",
+        "tonalRamp": [
+          "#0b0b0f",
+          "#24242b",
+          "#41414b",
+          "#60606d",
+          "#81818f",
+          "#a4a4af",
+          "#c8c8d1",
+          "#eeeef4"
+        ]
+      },
+      "error": {
+        "role": "error",
+        "displayName": "Alert Red",
+        "canonical": "#ff5555",
+        "tonalRamp": [
+          "#230000",
+          "#4f0004",
+          "#800313",
+          "#b41624",
+          "#dc4546",
+          "#f57b75",
+          "#ffaba4",
+          "#ffdbd5"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Countdown or team star total."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Green glowing site title and event line."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Full-screen loading and error messages."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Side text, headings, feed lines; board rows scale from min(66px, 1660px / (rows + 2)) at 0.9, stars and digits 1.4em bold."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Star legend and status line."
+      }
+    },
+    "shadows": [
+      {
+        "name": "title-glow",
+        "value": "0 0 4px var(--green), 0 0 12px var(--green)",
+        "purpose": "text-shadow on the green title and event line."
+      },
+      {
+        "name": "today-glow",
+        "value": "0 0 8px var(--white)",
+        "purpose": "text-shadow on today's day digit."
+      },
+      {
+        "name": "countdown-glow",
+        "value": "0 0 10px var(--white)",
+        "purpose": "text-shadow on the display figure."
+      },
+      {
+        "name": "heading-glow",
+        "value": "0 0 6px var(--white)",
+        "purpose": "text-shadow on --- Title --- headings."
+      }
+    ],
+    "motion": [],
+    "breakpoints": [
+      {
+        "name": "stage",
+        "value": "3840x2160 (uniform scale to viewport; no breakpoints)"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Board Line",
+      "kind": "custom",
+      "refersTo": "board-line",
+      "description": "Signature row: right-aligned position and score in ch columns, one asterisk per day in its star colour, then the name.",
+      "html": "<div class=\"ds-screen\"><p class=\"ds-days\"><span class=\"ds-pos\"></span><span class=\"ds-score\"></span><span class=\"ds-stars\"><span class=\"ds-dopen\">12345</span><span class=\"ds-dtoday\">6</span><span>789012</span></span></p><p class=\"ds-line\"><span class=\"ds-pos\">1)</span><span class=\"ds-score\">244</span><span class=\"ds-stars\"><span class=\"ds-both\">*****</span><span class=\"ds-first\">*</span><span class=\"ds-open\">******</span></span><span class=\"ds-name\">Sanne de Vries</span></p></div>",
+      "css": ".ds-screen{background:var(--bg,#0f0f23);color:var(--text,#cccccc);font-family:'Source Code Pro',monospace;font-variant-ligatures:none;padding:24px;}.ds-line,.ds-days{display:flex;white-space:pre;margin:0;font-size:30px;line-height:1.3;align-items:baseline;}.ds-line>span,.ds-days>span{flex:none;}.ds-pos{width:4ch;text-align:right;}.ds-score{width:6ch;text-align:right;margin-right:1ch;}.ds-stars{margin-right:1ch;font-size:1.4em;line-height:1;font-weight:700;}.ds-days{color:var(--locked,#333340);}.ds-dopen{color:var(--link,#009900);}.ds-dtoday{color:var(--white,#fff);text-shadow:0 0 8px var(--white,#fff);}.ds-both{color:var(--gold,#ffff66);}.ds-first{color:var(--silver,#9999cc);}.ds-open{color:var(--open,#333366);}.ds-name{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;}"
+    },
+    {
+      "name": "Site Title",
+      "kind": "custom",
+      "refersTo": "site-title",
+      "description": "Green glowing 'Advent of Code' with the event line beneath; caesar wrapper at 60% opacity with a 4px glow.",
+      "html": "<div class=\"ds-screen\"><h1 class=\"ds-title\">Advent of Code</h1><p class=\"ds-title\">  <span class=\"ds-wrap\">{caesar:</span>2026<span class=\"ds-wrap\">}</span></p></div>",
+      "css": ".ds-screen{background:var(--bg,#0f0f23);color:var(--text,#cccccc);font-family:'Source Code Pro',monospace;font-variant-ligatures:none;padding:24px;}.ds-title{margin:0;font:inherit;font-size:48px;line-height:1.1;white-space:pre;color:var(--green,#00cc00);text-shadow:0 0 4px var(--green,#00cc00),0 0 12px var(--green,#00cc00);}.ds-wrap{opacity:.33;}"
+    },
+    {
+      "name": "Section Heading",
+      "kind": "custom",
+      "refersTo": "section-heading",
+      "description": "AoC heading form --- Title --- in glowing white.",
+      "html": "<div class=\"ds-screen\"><h2 class=\"ds-h2\">--- Day 6: fastest ---</h2></div>",
+      "css": ".ds-screen{background:var(--bg,#0f0f23);color:var(--text,#cccccc);font-family:'Source Code Pro',monospace;font-variant-ligatures:none;padding:24px;}.ds-h2{margin:0 0 10px;font:inherit;font-size:30px;line-height:1.3;color:var(--white,#fff);text-shadow:0 0 6px var(--white,#fff);}"
+    },
+    {
+      "name": "Countdown",
+      "kind": "custom",
+      "refersTo": "countdown",
+      "description": "Unlock countdown: grey lead line, glowing white display figure, dim date line.",
+      "html": "<div class=\"ds-screen\"><p class=\"ds-p\">Day 7 unlocks in</p><p class=\"ds-count\">16:42:28</p><p class=\"ds-p ds-dim\">14 November at 07:59</p></div>",
+      "css": ".ds-screen{background:var(--bg,#0f0f23);color:var(--text,#cccccc);font-family:'Source Code Pro',monospace;font-variant-ligatures:none;padding:24px;}.ds-p{margin:0;font-size:30px;line-height:1.3;}.ds-dim{color:var(--dim,#8a8a9e);}.ds-count{margin:0;font-size:75px;line-height:1.15;color:var(--white,#fff);text-shadow:0 0 10px var(--white,#fff);}"
+    },
+    {
+      "name": "Feed Line",
+      "kind": "custom",
+      "refersTo": "board-line",
+      "description": "Latest-stars line: dim time, star-coloured asterisk, day column, name.",
+      "html": "<div class=\"ds-screen\"><p class=\"ds-line\"><span class=\"ds-dim ds-time\">Fri 14:45</span><span class=\"ds-both\">*</span><span class=\"ds-day\">day 6</span><span>bitflipper</span></p><p class=\"ds-line\"><span class=\"ds-dim ds-time\">Fri 14:11</span><span class=\"ds-first\">*</span><span class=\"ds-day\">day 6</span><span>bitflipper</span></p></div>",
+      "css": ".ds-screen{background:var(--bg,#0f0f23);color:var(--text,#cccccc);font-family:'Source Code Pro',monospace;font-variant-ligatures:none;padding:24px;}.ds-line{display:flex;white-space:pre;margin:0;font-size:30px;line-height:1.3;}.ds-line>span{flex:none;}.ds-dim{color:var(--dim,#8a8a9e);}.ds-time{margin-right:2ch;}.ds-both,.ds-first{margin-right:1ch;}.ds-both{color:var(--gold,#ffff66);}.ds-first{color:var(--silver,#9999cc);}.ds-day{width:7ch;}"
+    },
+    {
+      "name": "Status Line",
+      "kind": "custom",
+      "refersTo": "status-line",
+      "description": "One dim label line; turns Alert Red for stale or unreadable data.",
+      "html": "<div class=\"ds-screen\"><p class=\"ds-status\">24 players · 138 stars · updated Fri 15:16</p><p class=\"ds-status ds-err\">Data last updated Fri 15:16. The refresh may have stopped.</p></div>",
+      "css": ".ds-screen{background:var(--bg,#0f0f23);color:var(--text,#cccccc);font-family:'Source Code Pro',monospace;font-variant-ligatures:none;padding:24px;}.ds-status{margin:0 0 8px;font-size:20px;line-height:1.3;color:var(--dim,#8a8a9e);}.ds-err{color:var(--error,#ff5555);}"
+    },
+    {
+      "name": "Star Legend",
+      "kind": "custom",
+      "refersTo": "status-line",
+      "description": "One-line key for the star colours under the board.",
+      "html": "<div class=\"ds-screen\"><p class=\"ds-legend\"><span class=\"ds-both\">*</span> both stars · <span class=\"ds-first\">*</span> first star only · <span class=\"ds-open\">*</span> not solved yet</p></div>",
+      "css": ".ds-screen{background:var(--bg,#0f0f23);color:var(--text,#cccccc);font-family:'Source Code Pro',monospace;font-variant-ligatures:none;padding:24px;}.ds-legend{margin:0;font-size:20px;color:var(--dim,#8a8a9e);}.ds-both{color:var(--gold,#ffff66);}.ds-first{color:var(--silver,#9999cc);}.ds-open{color:var(--open,#333366);}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Terminal on the Wall",
+    "overview": "The screen is the adventofcode.com private leaderboard, not a dashboard about it. Everything is set in one monospace face on the AoC night-navy ground, and all structure comes from character columns, blank lines and glowing text, the way AoC itself is built. A colleague who plays should recognise the board from across the room before reading a single name.\n\nThe surface is laid out on a fixed 3840×2160 canvas and scaled uniformly to whatever player runs it (1920×1080 halves everything). Density follows the data: board rows shrink with the member count so the whole ranking always fits, capped at 25 lines. There is no interaction and no motion beyond the ticking countdown. There is no chrome either: no borders, fills, cards, radius or badges.",
+    "keyCharacteristics": [
+      "One typeface (Source Code Pro 400/700), ligatures off, every column measured in `ch`.",
+      "AoC's own palette: green glowing title, white glowing emphasis, gold and silver asterisk stars.",
+      "Glow (text-shadow in the text's own colour) is the only depth.",
+      "Structure from character columns, blank lines and `--- Title ---` headings.",
+      "Fixed 4K canvas, scaled as a whole."
+    ],
+    "rules": [
+      {
+        "name": "The Stars Carry Meaning Rule",
+        "body": "Gold means both stars, silver means first star only, open navy means unlocked but unsolved, locked slate means not yet available. These four colours are never used for anything else.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Ground Rule",
+        "body": "Night Navy is the only fill on the screen. Hierarchy comes from text colour and glow, never from a tinted row or panel.",
+        "section": "colors"
+      },
+      {
+        "name": "The Character Column Rule",
+        "body": "Columns are widths in `ch` (position 4ch right-aligned, score 6ch right-aligned, one-character gutters), never pixel tracks. Names take the remaining width and end in an ellipsis.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Face Rule",
+        "body": "Source Code Pro is the only typeface. Hierarchy comes from size, colour and glow, not from a second family.",
+        "section": "typography"
+      },
+      {
+        "name": "The Glow Is Emphasis Rule",
+        "body": "Glow is only for green title text and white emphasis text, always in the text's own colour. Body, dim, star and error text never glow.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** build every new piece of information as a line of character columns in Source Code Pro, widths in `ch`.",
+      "**Do** use `--- Title ---` headings in Glow White for new sections.",
+      "**Do** keep gold, silver, open navy and locked slate for star state only.",
+      "**Do** lay out at 3840×2160 and let the single stage scale handle smaller players.",
+      "**Do** state stale or missing data in Alert Red text, keeping the last good data visible."
+    ],
+    "donts": [
+      "**Don't** add cards, panels, borders, rounded corners, tinted rows or background fills.",
+      "**Don't** add medal badges, avatars or icons; the asterisk is the only mark.",
+      "**Don't** introduce a second typeface or turn ligatures back on.",
+      "**Don't** glow body, dim, star or error text.",
+      "**Don't** scroll or animate content; overflow is clipped or summarised in a dim `+ N` line."
+    ]
+  }
+}

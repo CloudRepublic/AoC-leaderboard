@@ -10,6 +10,16 @@
   "enabledPlugins": {
     "nx@nx-claude-plugins": true
   },
+  "permissions": {
+    "deny": [
+      "Read(**/.env)",
+      "Edit(**/.env)",
+      "Read(secrets/**)",
+      "Edit(secrets/**)",
+      "Read(**/*.session)",
+      "Edit(**/*.session)"
+    ]
+  },
   "sandbox": {
     "network": {
       "allowedDomains": ["www.google-analytics.com"]

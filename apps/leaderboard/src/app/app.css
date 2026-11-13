@@ -1,0 +1,383 @@
+:host {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* Fixed 4K canvas, scaled to the actual viewport. */
+.stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  box-sizing: border-box;
+  width: 3840px;
+  height: 2160px;
+  scale: var(--scale);
+  padding: 80px 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+  font-size: 60px;
+  line-height: 1.3;
+}
+
+/* CRT overlay: scanlines and vignette on top, a soft band rolling down. */
+.stage::before,
+.stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.stage::after {
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 3px,
+      rgb(0 0 0 / 0.28) 3px 6px
+    ),
+    radial-gradient(
+      ellipse 75% 70% at 50% 50%,
+      transparent 60%,
+      rgb(0 0 0 / 0.55) 100%
+    );
+}
+
+.stage::before {
+  inset: -20% 0 auto;
+  height: 20%;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgb(255 255 255 / 0.035),
+    transparent
+  );
+  animation: crt-roll 9s linear infinite;
+}
+
+@keyframes crt-roll {
+  to {
+    translate: 0 600%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage::before,
+  .title {
+    animation: none;
+  }
+}
+
+p,
+h1,
+h2,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: inherit;
+}
+
+.dim {
+  color: var(--dim);
+}
+
+/* Star colours, as on the AoC private board. */
+.both {
+  color: var(--gold);
+}
+.first {
+  color: var(--silver);
+}
+.open {
+  color: var(--open);
+}
+.locked {
+  color: var(--locked);
+}
+
+/* ---------- header ---------- */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+h1,
+.event {
+  font-size: 96px;
+  line-height: 1.1;
+  color: var(--green);
+  text-shadow:
+    0 0 4px var(--green),
+    0 0 12px var(--green);
+}
+
+/* AoC dims this to 33%; under the CRT scanlines that turns muddy, so it
+   stays brighter here with a tighter glow. */
+/* A faint CRT flicker: a few short, shallow dips at uneven moments. */
+.title {
+  animation: crt-flicker 7s steps(1, end) infinite;
+}
+
+@keyframes crt-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  31% {
+    opacity: 0.82;
+  }
+  32% {
+    opacity: 1;
+  }
+  33.5% {
+    opacity: 0.88;
+  }
+  34.5% {
+    opacity: 1;
+  }
+  71% {
+    opacity: 0.85;
+  }
+  72.5% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 0.92;
+  }
+  88.6% {
+    opacity: 1;
+  }
+}
+
+.event .wrap {
+  opacity: 0.6;
+  text-shadow: 0 0 4px var(--green);
+}
+
+.logo {
+  height: 160px;
+}
+
+/* ---------- layout ---------- */
+main {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  /* Side text follows the board, as AoC's sidebar follows its article. */
+  grid-template-columns: 1800px minmax(0, 1fr);
+  gap: 200px;
+}
+
+/* A line of fixed character columns: position, score, stars, name. */
+.line {
+  display: flex;
+  white-space: pre;
+}
+
+.line > span {
+  flex: none;
+}
+
+.pos {
+  width: 4ch;
+  text-align: right;
+}
+
+.score {
+  width: 6ch;
+  text-align: right;
+  margin-right: 1ch;
+}
+
+.stars {
+  margin-right: 1ch;
+}
+
+.line > .name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- board ---------- */
+.board {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  /* Row height follows the lines in view; past 25 lines the list scrolls. */
+  --row-h: min(66px, calc(1660px / (var(--rows) + 2)));
+  font-size: calc(var(--row-h) * 0.9);
+}
+
+.board .line {
+  height: var(--row-h);
+  line-height: var(--row-h);
+  align-items: baseline;
+}
+
+/* Star columns and their day digits are set larger than the rest of the line. */
+.board .stars {
+  font-size: 1.4em;
+  /* A fixed length, so the larger glyphs keep the text inside its row. */
+  line-height: var(--row-h);
+}
+
+.days {
+  color: var(--locked);
+}
+
+.days .open {
+  color: var(--link);
+}
+
+.days .today {
+  color: var(--white);
+  text-shadow: 0 0 8px var(--white);
+}
+
+.board .stars span {
+  font-weight: 700;
+}
+
+.more {
+  color: var(--dim);
+}
+
+/* The list window holds whole lines; overflowing lists scroll once a minute:
+   hold on the leaders, scroll down, hold on the bottom, glide back. */
+.window {
+  height: calc(var(--row-h) * var(--rows));
+  overflow: hidden;
+}
+
+/* Fade the edge where rows are hidden: the bottom while the leaders hold,
+   both while scrolling, the top while the bottom holds. */
+.window.scrolling {
+  --fade: calc(var(--row-h) * 1.5);
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    #000 var(--fade-top),
+    #000 calc(100% - var(--fade-bottom)),
+    transparent
+  );
+  animation: board-fade 60s linear infinite;
+}
+
+@keyframes board-fade {
+  0%,
+  12% {
+    --fade-top: 0px;
+    --fade-bottom: var(--fade);
+  }
+  16%,
+  76% {
+    --fade-top: var(--fade);
+    --fade-bottom: var(--fade);
+  }
+  80%,
+  92% {
+    --fade-top: var(--fade);
+    --fade-bottom: 0px;
+  }
+  100% {
+    --fade-top: 0px;
+    --fade-bottom: var(--fade);
+  }
+}
+
+.scrolling .reel {
+  /* Room for the last line's descenders at the bottom of the scroll. */
+  padding-bottom: 16px;
+  animation: board-scroll 60s ease-in-out infinite;
+}
+
+@keyframes board-scroll {
+  0%,
+  12% {
+    translate: 0 0;
+  }
+  80%,
+  92% {
+    translate: 0 calc(var(--row-h) * var(--overflow) * -1 - 16px);
+  }
+  100% {
+    translate: 0 0;
+  }
+}
+
+.legend {
+  margin-top: auto;
+  font-size: 40px;
+  color: var(--dim);
+}
+
+/* ---------- side text ---------- */
+aside {
+  display: flex;
+  flex-direction: column;
+  gap: 70px;
+  min-height: 0;
+}
+
+.countdown {
+  font-size: 150px;
+  line-height: 1.15;
+  color: var(--white);
+  text-shadow: 0 0 10px var(--white);
+}
+
+h2 {
+  color: var(--white);
+  text-shadow: 0 0 6px var(--white);
+  margin-bottom: 20px;
+}
+
+aside .pos {
+  width: 3ch;
+  margin-right: 1ch;
+}
+
+aside .time {
+  margin-right: 2ch;
+}
+
+aside .both,
+aside .first {
+  margin-right: 1ch;
+}
+
+aside .day {
+  width: 8ch;
+}
+
+.feed {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+footer {
+  font-size: 40px;
+  color: var(--dim);
+}
+
+footer.error {
+  color: var(--error);
+}
+
+.message {
+  margin: auto 0;
+  font-size: 80px;
+  color: var(--dim);
+}
+
+.message.error {
+  color: var(--error);
+}

@@ -1,0 +1,19 @@
+# Secrets never enter the build context
+secrets/
+**/.env
+**/.env.*
+!**/.env.example
+**/*.session
+
+# Generated or local-only
+node_modules
+dist
+tmp
+coverage
+.nx
+.angular
+.git
+.idea
+.vscode
+**/.impeccable/review
+/[0-9]*.json
