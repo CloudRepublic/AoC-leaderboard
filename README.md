@@ -1,284 +1,139 @@
-# Nx Angular Repository
+# Caesar Advent of Code leaderboard
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
-
-✨ A repository showcasing key [Nx](https://nx.dev) features for Angular monorepos ✨
-
-🚀 If you haven't connected to Nx Cloud yet, [complete your setup here](https://cloud.nx.app/get-started). Get faster builds with remote caching, distributed task execution, and self-healing CI. [See how your workspace can benefit](#nx-cloud).
-
-## 📦 Project Overview
-
-This repository demonstrates a production-ready Angular monorepo with:
-
-- **2 Applications**
-
-  - `shop` - Angular e-commerce application with product listings and detail views
-  - `api` - Backend API with Docker support serving product data
-
-- **6 Libraries**
-
-  - `@org/feature-products` - Product listing feature (Angular)
-  - `@org/feature-product-detail` - Product detail feature (Angular)
-  - `@org/data` - Data access layer for shop features
-  - `@org/shared-ui` - Shared UI components
-  - `@org/models` - Shared data models
-  - `@org/products` - API product service library
-
-- **E2E Testing**
-  - `shop-e2e` - Playwright tests for the shop application
-
-## 🚀 Quick Start
+A single-screen Angular app (`apps/leaderboard`) that shows the Caesar private
+Advent of Code leaderboard on a 4K display (e.g. a Xibo _Webpage_ widget).
+The layout is designed at 3840×2160 and scales to fit any screen size.
 
 ```bash
-# Clone the repository
-git clone <your-fork-url>
-cd <your-repository-name>
-
-# Install dependencies
-# (Note: You may need --legacy-peer-deps)
-npm install
-
-# Serve the Angular shop application (this will simultaneously serve the API backend)
-npx nx run shop:serve
-
-# ...or you can serve the API separately
-npx nx run api:serve
-
-# Build all projects
-npx nx run-many -t build
-
-# Run tests
-npx nx run-many -t test
-
-# Lint all projects
-npx nx run-many -t lint
-
-# Run e2e tests
-npx nx run shop-e2e:e2e
-
-# Run tasks in parallel
-
-npx nx run-many -t lint test build e2e --parallel=3
-
-# Visualize the project graph
-npx nx graph
+npx nx serve leaderboard     # dev server on http://localhost:4250
+npx nx build leaderboard     # static output in dist/apps/leaderboard/browser
+npx nx test leaderboard
 ```
 
-## ⭐ Featured Nx Capabilities
+## Test data
 
-This repository showcases several powerful Nx features:
+`apps/leaderboard/fixtures/fake-50.json` is a made-up finished event with 50 scoring
+players, 6 without points and the owner account. Development builds include it:
+run `npx nx serve leaderboard` and open http://localhost:4250/?src=fake-50.json.
 
-### 1. 🔒 Module Boundaries
+## Data: the leaderboard server
 
-Enforces architectural constraints using tags. Each project has specific dependencies it can use:
+`apps/leaderboard-server` is the only thing that talks to adventofcode.com. It
+fetches the private leaderboard JSON with your session cookie **at most once
+every 15 minutes** (AoC's rule), caches it, and serves it to the screen at
+`/api/leaderboard.json`. In production it also serves the built screen, so one
+process is all the Xibo player needs to point at.
 
-- `scope:shared` - Can be used by all projects
-- `scope:shop` - Shop-specific libraries
-- `scope:api` - API-specific libraries
-- `type:feature` - Feature libraries
-- `type:data` - Data access libraries
-- `type:ui` - UI component libraries
+- The 15-minute limit is enforced in code and can't be lowered:
+  `AOC_REFRESH_SECONDS` only accepts 900 or more. Failed attempts count too.
+  The time of the last attempt is saved to the cache file before each request,
+  so restarts can't cause an early request.
+- When AoC rejects the cookie (they last about a month), the server logs it and
+  keeps serving the last data. The screen's footer turns red once the data is
+  older than 45 minutes.
+- The screen leaves the owner account (`owner_id`) off and only lists members
+  with points; the others are counted.
 
-**Try it out:**
+### Configure the session cookie
+
+1. In the browser, log in to adventofcode.com and copy the value of the
+   `session` cookie (developer tools, Application/Storage, Cookies).
+2. Put it in a file only you can read. `secrets/` and `*.session` are
+   git-ignored:
+
+   ```bash
+   mkdir -p secrets
+   pbpaste > secrets/aoc.session   # or paste it with an editor
+   chmod 600 secrets/aoc.session
+   ```
+
+3. Point the server at it. For local runs, copy
+   `apps/leaderboard-server/.env.example` to `apps/leaderboard-server/.env`
+   (git-ignored, loaded by Nx). On a server, set the variable in the service
+   definition or use your platform's secret store:
+
+   ```bash
+   AOC_SESSION_FILE=secrets/aoc.session
+   AOC_LEADERBOARD_ID=<the number in your private leaderboard's URL>
+   ```
+
+   The leaderboard id is required and deliberately has no default in the code,
+   so it never ends up in the repository.
+
+`AOC_SESSION` (the value itself) also works but is less safe, because process
+environments are easier to leak. The server warns at startup when the secret
+file is readable by other users, refuses to start without a valid-looking
+cookie, and never logs the cookie, writes it to the cache or sends it to the
+browser.
+
+Other settings (all optional) are listed in `apps/leaderboard-server/.env.example`.
+
+### Run it
 
 ```bash
-# See the current project graph and boundaries
-npx nx graph
-
-# View a specific project's details
-npx nx show project shop --web
+npx nx serve leaderboard-server   # API on http://localhost:4251
+npx nx serve leaderboard          # screen on http://localhost:4250, /api is proxied
 ```
 
-[Learn more about module boundaries →](https://nx.dev/docs/features/enforce-module-boundaries)
-
-### 2. 🐳 Docker Integration
-
-The API project includes Docker support with automated targets and release management:
+Production:
 
 ```bash
-# Build Docker image
-npx nx run api:docker:build
-
-# Run Docker container
-npx nx run api:docker:run
-
-# Release with automatic Docker image versioning
-npx nx release
+npx nx run-many -t build -p leaderboard leaderboard-server
+HOST=0.0.0.0 PORT=8080 AOC_LEADERBOARD_ID=<id> AOC_SESSION_FILE=/run/secrets/aoc.session \
+  node dist/apps/leaderboard-server/main.js
 ```
 
-**Nx Release for Docker:** The repository is configured to use Nx Release for managing Docker image versioning and publishing. When running `nx release`, Docker images for the API project are automatically versioned and published based on the release configuration in `nx.json`. This integrates seamlessly with semantic versioning and changelog generation.
+Run it from the workspace root, or set `STATIC_DIR` (the screen's
+`dist/apps/leaderboard/browser` folder) and `AOC_CACHE_FILE` to absolute paths.
+Point the Xibo webpage widget at `http://<host>:8080/`.
 
-[Learn more about Docker integration →](https://nx.dev/docs/guides/nx-release/release-docker-images)
+### CI
 
-### 3. 🎭 Playwright E2E Testing
+`.github/workflows/ci.yml` runs on pull requests and pushes to `main`:
 
-End-to-end testing with Playwright is pre-configured:
+1. **Lint, test and build**: secret check over all tracked files, Prettier
+   check, then `nx run-many -t lint test build`.
+2. **Docker image**: builds the image for `linux/amd64` and `linux/arm64` (the
+   JavaScript is built once and shared). Pull requests only build it; pushes to
+   `main` publish it to the GitHub Container Registry as
+   `ghcr.io/<owner>/<repo>` with `latest` and `sha-<commit>` tags. No secrets
+   are needed: it uses the workflow's own `GITHUB_TOKEN`.
+
+### Keeping private data out of git
+
+The cookie, `.env` files, `secrets/`, leaderboard dumps (`<id>.json`) and design
+review screenshots of the live board are git-ignored. On top of that, a
+pre-commit check (`tools/check-secrets.mjs`, installed as a git hook by
+`npm install`) blocks a commit that contains any of those files, something that
+looks like a session cookie, a concrete private leaderboard URL, or your own
+leaderboard id or cookie as configured in `apps/leaderboard-server/.env`. It
+never prints the values it finds. CI runs the same check on every tracked file.
+
+### Docker
+
+The `Dockerfile` builds the screen and the server on Google's distroless
+Node.js 24 image (`gcr.io/distroless/nodejs24-debian13:nonroot`): no shell or
+package manager, running as the `nonroot` user (65532). The server is bundled
+into a single file with its dependencies, and everything the project adds
+(server, screen, data folder) goes into one layer of about 2 MB. Rebuild
+regularly to pick up the base image's security updates.
 
 ```bash
-# Run e2e tests
-npx nx run shop-e2e:e2e
-
-# Run e2e tests in CI mode
-npx nx run shop-e2e:e2e-ci
+docker build -t caesar-aoc-leaderboard .
+docker run -d --name aoc-leaderboard -p 8080:8080 \
+  -e AOC_LEADERBOARD_ID=<id> \
+  -v aoc-cache:/app/data \
+  -v "$PWD/secrets/aoc.session:/run/secrets/aoc_session:ro" \
+  caesar-aoc-leaderboard
 ```
 
-[Learn more about E2E testing →](https://nx.dev/docs/technologies/test-tools/playwright)
+- Keep `/app/data` on a volume: it holds the cache and the time of the last AoC
+  request, which is what keeps the 15-minute limit across container restarts.
+- The cookie is mounted read-only at `/run/secrets/aoc_session` and never baked
+  into the image (`.dockerignore` keeps `secrets/` and `.env` files out of the
+  build context). On a Linux host the container user `65532` must be able to read
+  it: `sudo chown 65532 secrets/aoc.session` (keep `chmod 600`).
+- The other settings are environment variables, as above (`-e AOC_YEAR=2026`).
 
-### 4. ⚡ Vitest for Unit Testing
-
-Fast unit testing with Vite for Angular libraries:
-
-```bash
-# Test a specific library
-npx nx run data:test
-
-# Test all projects
-npx nx run-many -t test
-```
-
-[Learn more about Vite testing →](https://nx.dev/docs/technologies/build-tools/vite)
-
-### 5. 🔧 Self-Healing CI
-
-The CI pipeline includes `nx fix-ci` which automatically identifies and suggests fixes for common issues:
-
-```bash
-# In CI, this command provides automated fixes
-npx nx fix-ci
-```
-
-This feature helps maintain a healthy CI pipeline by automatically detecting and suggesting solutions for:
-
-- Missing dependencies
-- Incorrect task configurations
-- Cache invalidation issues
-- Common build failures
-
-[Learn more about self-healing CI →](https://nx.dev/docs/features/ci-features/self-healing-ci)
-
-## 📁 Project Structure
-
-```
-├── apps/
-│   ├── shop/           [scope:shop]    - Angular e-commerce app
-│   ├── shop-e2e/                       - E2E tests for shop
-│   └── api/            [scope:api]     - Backend API with Docker
-├── packages/
-│   ├── shop/
-│   │   ├── feature-products/        [scope:shop,type:feature] - Product listing
-│   │   ├── feature-product-detail/  [scope:shop,type:feature] - Product details
-│   │   ├── data/                    [scope:shop,type:data]    - Data access
-│   │   └── shared-ui/               [scope:shop,type:ui]      - UI components
-│   ├── api/
-│   │   └── products/    [scope:api]    - Product service
-│   └── shared/
-│       └── models/      [scope:shared,type:data] - Shared models
-├── nx.json             - Nx configuration
-├── tsconfig.json       - TypeScript configuration
-└── eslint.config.mjs   - ESLint with module boundary rules
-```
-
-## 🏷️ Understanding Tags
-
-This repository uses tags to enforce module boundaries:
-
-| Project            | Tags                         | Can Import From              |
-| ------------------ | ---------------------------- | ---------------------------- |
-| `shop`             | `scope:shop`                 | `scope:shop`, `scope:shared` |
-| `api`              | `scope:api`                  | `scope:api`, `scope:shared`  |
-| `feature-products` | `scope:shop`, `type:feature` | `scope:shop`, `scope:shared` |
-| `data`             | `scope:shop`, `type:data`    | `scope:shared`               |
-| `models`           | `scope:shared`, `type:data`  | Nothing (base library)       |
-
-## 📚 Useful Commands
-
-```bash
-# Project exploration
-npx nx graph                                    # Interactive dependency graph
-npx nx list                                     # List installed plugins
-npx nx show project shop --web                 # View project details
-
-# Development
-npx nx run shop:serve                              # Serve Angular app
-npx nx run api:serve                               # Serve backend API
-npx nx run shop:build                              # Build Angular app
-npx nx run data:test                               # Test a specific library
-npx nx run feature-products:lint                   # Lint a specific library
-
-# Running multiple tasks
-npx nx run-many -t build                       # Build all projects
-npx nx run-many -t test --parallel=3          # Test in parallel
-npx nx run-many -t lint test build            # Run multiple targets
-
-# Affected commands (great for CI)
-npx nx affected -t build                       # Build only affected projects
-npx nx affected -t test                        # Test only affected projects
-
-# Docker operations
-npx nx run api:docker:build                        # Build Docker image
-npx nx run api:docker:run                          # Run Docker container
-```
-
-## 🎯 Adding New Features
-
-### Generate a new Angular application:
-
-```bash
-npx nx g @nx/angular:app my-app
-```
-
-### Generate a new Angular library:
-
-```bash
-npx nx g @nx/angular:lib my-lib
-```
-
-### Generate a new Angular component:
-
-```bash
-npx nx g @nx/angular:component my-component --project=my-lib
-```
-
-### Generate a new API library:
-
-```bash
-npx nx g @nx/node:lib my-api-lib
-```
-
-You can use `npx nx list` to see all available plugins and `npx nx list <plugin-name>` to see all generators for a specific plugin.
-
-## Nx Cloud
-
-Nx Cloud ensures a [fast and scalable CI](https://nx.dev/nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
-
-- [Remote caching](https://nx.dev/docs/features/ci-features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/docs/features/ci-features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/docs/features/ci-features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/docs/features/ci-features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/docs/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## 🔗 Learn More
-
-- [Nx Documentation](https://nx.dev/docs)
-- [Angular Monorepo Tutorial](https://nx.dev/docs/getting-started/tutorials/angular-monorepo-tutorial)
-- [Module Boundaries](https://nx.dev/docs/features/enforce-module-boundaries)
-- [Docker Integration](https://nx.dev/docs/guides/nx-release/release-docker-images)
-- [Playwright Testing](https://nx.dev/docs/technologies/test-tools/playwright)
-- [Vite with Angular](https://nx.dev/docs/technologies/build-tools/vite)
-- [Nx Cloud](https://nx.dev/nx-cloud)
-- [Releasing Packages](https://nx.dev/docs/features/manage-releases)
-
-## 💬 Community
-
-Join the Nx community:
-
-- [Discord](https://go.nx.dev/community)
-- [X (Twitter)](https://twitter.com/nxdevtools)
-- [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [YouTube](https://www.youtube.com/@nxdevtools)
-- [Blog](https://nx.dev/blog)
+The screen can also read any other JSON with `?src=<url>` (the URL has to allow
+CORS).

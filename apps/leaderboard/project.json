@@ -1,0 +1,98 @@
+{
+  "name": "leaderboard",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "app",
+  "sourceRoot": "apps/leaderboard/src",
+  "tags": ["scope:leaderboard"],
+  "targets": {
+    "build": {
+      "executor": "@angular/build:application",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/apps/leaderboard",
+        "browser": "apps/leaderboard/src/main.ts",
+        "tsConfig": "apps/leaderboard/tsconfig.app.json",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/leaderboard/public"
+          }
+        ],
+        "styles": [
+          "node_modules/@fontsource/source-code-pro/400.css",
+          "node_modules/@fontsource/source-code-pro/700.css",
+          "apps/leaderboard/src/styles.css"
+        ]
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "8kb",
+              "maximumError": "16kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "assets": [
+            {
+              "glob": "**/*",
+              "input": "apps/leaderboard/public"
+            },
+            {
+              "glob": "fake-50.json",
+              "input": "apps/leaderboard/fixtures",
+              "output": "."
+            }
+          ]
+        }
+      }
+    },
+    "serve": {
+      "continuous": true,
+      "readyWhen": {
+        "signal": true
+      },
+      "executor": "@angular/build:dev-server",
+      "defaultConfiguration": "development",
+      "configurations": {
+        "production": {
+          "buildTarget": "leaderboard:build:production"
+        },
+        "development": {
+          "buildTarget": "leaderboard:build:development"
+        }
+      },
+      "options": {
+        "port": 4250,
+        "proxyConfig": "apps/leaderboard/proxy.conf.json"
+      }
+    },
+    "serve-static": {
+      "continuous": true,
+      "readyWhen": {
+        "signal": true
+      },
+      "dependsOn": ["build"],
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "leaderboard:build",
+        "staticFilePath": "dist/apps/leaderboard/browser",
+        "spa": true,
+        "port": 4250
+      }
+    }
+  }
+}

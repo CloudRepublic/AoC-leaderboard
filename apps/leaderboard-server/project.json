@@ -1,0 +1,54 @@
+{
+  "name": "leaderboard-server",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/leaderboard-server/src",
+  "projectType": "application",
+  "tags": ["scope:leaderboard"],
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/apps/leaderboard-server",
+        "format": ["cjs"],
+        "bundle": false,
+        "main": "apps/leaderboard-server/src/main.ts",
+        "tsConfig": "apps/leaderboard-server/tsconfig.app.json",
+        "generatePackageJson": false,
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
+        }
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "bundle": true,
+          "thirdParty": true,
+          "minify": true,
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        }
+      }
+    },
+    "serve": {
+      "continuous": true,
+      "executor": "nx:run-commands",
+      "readyWhen": {
+        "signal": true
+      },
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "tsx watch apps/leaderboard-server/src/main.ts"
+      }
+    }
+  }
+}

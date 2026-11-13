@@ -54,3 +54,16 @@ vitest.config.*.timestamp*
 .nx/polygraph
 .nx/self-healing
 .nx/migrate-runs
+.vitest
+
+# AoC session cookie and local config: never commit these
+.env
+.env.*
+!.env.example
+secrets/
+*.session
+
+# Real AoC data: leaderboard dumps (named after the private leaderboard id) and
+# design review screenshots of the live board
+/[0-9]*.json
+**/.impeccable/review/

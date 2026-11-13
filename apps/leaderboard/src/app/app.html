@@ -1,0 +1,179 @@
+<div class="stage">
+  <header>
+    <div class="title">
+      <h1>Advent of Code</h1>
+      @if (data(); as lb) {
+      <p class="event">
+        &nbsp;&nbsp;<span class="wrap">&#123;caesar:</span>{{ lb.event }}<span
+          class="wrap"
+          >&#125;</span
+        >
+      </p>
+      }
+    </div>
+    @if (!logoMissing()) {
+    <img
+      class="logo"
+      src="caesar-logo.svg"
+      alt="Caesar"
+      (error)="logoMissing.set(true)"
+    />
+    }
+  </header>
+
+  @if (data(); as lb) {
+  <main>
+    <section
+      class="board"
+      [style.--rows]="board().visible"
+      [style.--overflow]="board().overflow"
+    >
+      <div class="days" aria-hidden="true">
+        @for (digits of ['tens', 'units']; track digits) {
+        <p class="line">
+          <span class="pos"></span><span class="score"></span>
+          <span class="stars">
+            @for (day of days(); track day) {
+            <span
+              [class.open]="day <= unlocked()"
+              [class.today]="day === unlocked()"
+              >{{ digits === 'tens' ? (day >= 10 ? '1' : ' ') : day % 10
+              }}</span
+            >
+            }
+          </span>
+        </p>
+        }
+      </div>
+      <div class="window" [class.scrolling]="board().overflow">
+        <div class="reel">
+          <ol>
+            @for (row of board().shown; track row.id) {
+            <li class="line">
+              <span class="pos"
+                >{{ board().shown[$index - 1]?.rank === row.rank ? '' : row.rank
+                + ')' }}</span
+              >
+              <span class="score">{{ row.score }}</span>
+              <span class="stars">
+                @for (s of row.days; track $index) {
+                <span
+                  [class]="
+                          s === 2
+                            ? 'both'
+                            : s === 1
+                              ? 'first'
+                              : $index < unlocked()
+                                ? 'open'
+                                : 'locked'
+                        "
+                  >*</span
+                >
+                }
+              </span>
+              <span class="name">{{ row.name }}</span>
+            </li>
+            }
+          </ol>
+          @if (!board().shown.length) {
+          <p class="line more">
+            <span class="pos"></span><span class="score"></span>
+            <span>No points yet · {{ rows().length }} players</span>
+          </p>
+          } @else if (board().withoutPoints) {
+          <p class="line more">
+            <span class="pos"></span><span class="score"></span>
+            <span class="stars">{{ ' '.repeat(days().length) }}</span>
+            <span class="name"
+              >+ {{ board().withoutPoints }} without points</span
+            >
+          </p>
+          }
+        </div>
+      </div>
+      <p class="legend">
+        <span class="both">*</span> both stars ·
+        <span class="first">*</span> first star only ·
+        <span class="open">*</span> not solved yet
+      </p>
+    </section>
+
+    <aside>
+      <section>
+        @if (countdown(); as c) {
+        <p>Day {{ c.day }} unlocks in</p>
+        <p class="countdown">{{ c.left }}</p>
+        <p class="dim">{{ c.at }}</p>
+        } @else {
+        <p>All {{ lb.num_days }} puzzles are unlocked.</p>
+        <p class="countdown">{{ totalStars() }}<span class="both">*</span></p>
+        <p class="dim">collected by the team</p>
+        }
+      </section>
+
+      <section>
+        <h2>
+          --- {{ podium() ? 'Day ' + podium()!.day + ': ' : '' }}fastest ---
+        </h2>
+        @if (podium()?.finishers?.length) {
+        <ol>
+          @for (f of podium()!.finishers; track f.name) {
+          <li class="line">
+            <span class="pos">{{ $index + 1 }})</span>
+            <span class="time">{{ f.time }}</span>
+            <span class="name">{{ f.name }}</span>
+          </li>
+          }
+        </ol>
+        } @else if (podium()) {
+        <p class="dim">
+          Nobody has both stars for day {{ podium()!.day }} yet.
+        </p>
+        } @else {
+        <p class="dim">The first puzzle hasn't unlocked yet.</p>
+        }
+      </section>
+
+      <section class="feed">
+        <h2>--- Latest stars ---</h2>
+        @if (latest().length) {
+        <ol>
+          @for (s of latest(); track s.ts + s.name + s.part) {
+          <li class="line">
+            <span class="time dim">{{ s.time }}</span>
+            <span [class]="s.part === 2 ? 'both' : 'first'">*</span>
+            <span class="day">day {{ s.day }}</span>
+            <span class="name">{{ s.name }}</span>
+          </li>
+          }
+        </ol>
+        } @else {
+        <p class="dim">No stars yet. Good luck, everyone!</p>
+        }
+      </section>
+
+      @if (error()) {
+      <footer class="error">
+        Can't read the leaderboard data. Showing the update from {{ updated()
+        }}.
+      </footer>
+      } @else if (stale()) {
+      <footer class="error">
+        Data last updated {{ updated() }}. The refresh may have stopped.
+      </footer>
+      } @else {
+      <footer>
+        {{ rows().length }} players · {{ totalStars() }} stars · updated {{
+        updated() }}
+      </footer>
+      }
+    </aside>
+  </main>
+  } @else if (error()) {
+  <p class="message error">
+    Can't read the leaderboard data. Trying again every minute.
+  </p>
+  } @else {
+  <p class="message">Loading…</p>
+  }
+</div>

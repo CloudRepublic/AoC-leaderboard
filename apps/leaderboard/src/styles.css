@@ -1,0 +1,43 @@
+/* adventofcode.com palette */
+:root {
+  --bg: #0f0f23;
+  --text: #cccccc;
+  --dim: #8a8a9e;
+  --white: #ffffff;
+  --green: #00cc00;
+  --link: #009900;
+  --gold: #ffff66;
+  --silver: #9999cc;
+  --open: #333366;
+  --locked: #333340;
+  --error: #ff5555;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Source Code Pro', monospace;
+  font-variant-ligatures: none;
+}
+
+::selection {
+  background: var(--link);
+  color: var(--white);
+}
+
+/* Animatable fade sizes for the scrolling board (see app.css). */
+@property --fade-top {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --fade-bottom {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
