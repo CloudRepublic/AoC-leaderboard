@@ -1,4 +1,4 @@
-<div class="stage">
+<div class="stage" [class.waiting]="data() && !unlocked()">
   <header>
     <div class="title">
       <h1>Advent of Code</h1>
@@ -21,7 +21,27 @@
     }
   </header>
 
-  @if (data(); as lb) {
+  @if (data(); as lb) { @if (!unlocked()) {
+  <main class="prelaunch">
+    <section class="hero">
+      <p>Puzzel 1 opent over</p>
+      <p class="countdown">{{ countdown()?.left }}</p>
+      <p class="dim">{{ countdown()?.at }}</p>
+    </section>
+    <p class="calendar" aria-hidden="true">
+      @for (day of days(); track day) {
+      <span class="day-cell"
+        ><span class="locked">*</span><span class="dim">{{ day }}</span></span
+      >
+      }
+    </p>
+    <p class="invite">
+      {{ rows().length }} deelnemers doen mee.<br />
+      Los beide delen snel op en klim in de ranglijst.
+    </p>
+    <footer>{{ lb.num_days }} puzzels · elke dag om 06:00</footer>
+  </main>
+  } @else {
   <main>
     <section
       class="board"
@@ -169,7 +189,7 @@
       }
     </aside>
   </main>
-  } @else if (error()) {
+  } } @else if (error()) {
   <p class="message error">
     Can't read the leaderboard data. Trying again every minute.
   </p>
